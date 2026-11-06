@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+/* ==================================================================
+   PLANTILLA DE MENÚ DIGITAL - Admin PC
+   Para cada cliente cambia SOLO este bloque. No toques el resto.
+   Guarda el archivo como index.html antes de subirlo al hosting.
+   ================================================================== */
+window.CONFIG = {
+  nombre: "Tacos El Mezquite",
+  eslogan: "Carne asada al carbón y antojitos sonorenses. Hermosillo, Sonora.",
+  datos: ["Abierto hoy 6:00 pm a 1:00 am", "Recoger o a domicilio"],
+
+  // WhatsApp del negocio: 52 + 10 dígitos, sin +, sin espacios ni guiones
+  whatsapp: "526623681180",
+
+  // Para clientes reales deja cintillo en "" y pie en [] (quita la leyenda de ejemplo)
+  cintillo: "Ejemplo de menú digital hecho por Admin PC. Tu negocio aquí.",
+  pie: [
+    "¿Quieres un menú así para tu negocio?",
+    "Escríbele a Admin PC por WhatsApp al 662 368 1180.",
+    "Productos y precios de este menú son de ejemplo."
+  ],
+
+  // Promo destacada. Pon activa: false para ocultarla
+  promo: {
+    activa: true,
+    etiqueta: "Promo fin de semana largo · 13 al 17 de nov",
+    titulo: "Combo familiar: 12 tacos + 2 aguas por $360",
+    texto: "Agrégalo abajo y manda tu pedido por WhatsApp."
+  },
+
+  // El orden de las categorías es el orden en que salen en el menú
+  categorias: ["Tacos", "Sonorense", "Combos", "Bebidas"],
+
+  // Un producto por línea. id único y sin espacios. price es solo el número
+  productos: [
+    { id: "t1", cat: "Tacos", name: "Taco de carne asada", desc: "Tortilla de maíz, carne al carbón, cebolla y cilantro.", price: 28 },
+    { id: "t2", cat: "Tacos", name: "Taco de adobada", desc: "Cerdo adobado con piña asada.", price: 26 },
+    { id: "t3", cat: "Tacos", name: "Taco de machaca", desc: "Machaca de res con huevo, chile y cebolla.", price: 32 },
+    { id: "s1", cat: "Sonorense", name: "Caramelo", desc: "Tortilla de harina a la plancha con queso y carne asada.", price: 55 },
+    { id: "s2", cat: "Sonorense", name: "Mulita", desc: "Dos tortillas de maíz selladas con queso y carne.", price: 52 },
+    { id: "s3", cat: "Sonorense", name: "Dogo sonorense", desc: "Salchicha con tocino, frijoles, pico de gallo y salsa verde.", price: 58 },
+    { id: "s4", cat: "Sonorense", name: "Burro de machaca", desc: "Tortilla de harina grande con machaca, frijoles y queso.", price: 75 },
+    { id: "c1", cat: "Combos", name: "Combo familiar", desc: "12 tacos de carne asada y 2 aguas de 600 ml. Promo 13 al 17 de nov.", price: 360 },
+    { id: "c2", cat: "Combos", name: "Combo pareja", desc: "6 tacos surtidos y 2 bebidas.", price: 199 },
+    { id: "b1", cat: "Bebidas", name: "Agua de jamaica 600 ml", desc: "Preparada en el día.", price: 28 },
+    { id: "b2", cat: "Bebidas", name: "Horchata 600 ml", desc: "Con canela, bien fría.", price: 28 },
+    { id: "b3", cat: "Bebidas", name: "Coca-Cola 600 ml", desc: "", price: 30 }
+  ],
+
+  // Pedido precargado solo para la demo. Para clientes déjalo así: {}
+  carritoInicial: { t1: 3, b1: 1 }
+};
+</script>
+<title>Tacos El Mezquite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: phone-first menu board. Ribbon, hero with promo, sticky category chips, item rows with steppers, order summary, fixed order bar. */
+:root {
+  --bg: #F1F3EE;
+  --surface: #FFFFFF;
+  --ink: #1B211D;
+  --muted: #566159;
+  --line: #D7DDD3;
+  --chile: #C42B16;
+  --chile-ink: #FFFFFF;
+  --salsa: #3F6A12;
+  --maiz: #F3B41B;
+  --maiz-ink: #2A2000;
+  --font-display: "Alfa Slab One", Georgia, "Times New Roman", serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141814;
+    --surface: #1E241E;
+    --ink: #EEF2E8;
+    --muted: #A4B0A4;
+    --line: #343D34;
+    --chile: #EA5A44;
+    --chile-ink: #1B0804;
+    --salsa: #9CCB5A;
+    --maiz: #F3B41B;
+    --maiz-ink: #2A2000;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141814;
+  --surface: #1E241E;
+  --ink: #EEF2E8;
+  --muted: #A4B0A4;
+  --line: #343D34;
+  --chile: #EA5A44;
+  --chile-ink: #1B0804;
+  --salsa: #9CCB5A;
+  --maiz: #F3B41B;
+  --maiz-ink: #2A2000;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.45;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 120px;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  z-index: 10;
+  background: var(--bg);
+}
+.wrap { max-width: 640px; margin: 0 auto; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--chile); outline-offset: 2px; }
+
+.ribbon {
+  margin: 0 -16px;
+  padding: 8px 16px;
+  background: var(--maiz);
+  color: var(--maiz-ink);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.hero { padding-top: 28px; display: grid; gap: 10px; }
+.hero h1 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.2rem, 11vw, 3.4rem);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  margin: 0;
+  text-wrap: balance;
+}
+.hero p { margin: 0; color: var(--muted); }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 14px; font-weight: 600; }
+.meta span::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--salsa); margin-right: 7px; }
+
+.promo {
+  margin-top: 18px;
+  padding: 16px;
+  border: 2px solid var(--chile);
+  border-radius: 6px;
+  display: grid;
+  gap: 4px;
+}
+.promo .tag {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--chile);
+}
+.promo strong { font-family: var(--font-display); font-weight: 400; font-size: 1.35rem; line-height: 1.15; }
+.promo span { color: var(--muted); font-size: 14px; }
+
+nav.chips {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 5;
+  margin: 22px -16px 0;
+  padding: 10px 16px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+.chip {
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  font-weight: 600;
+  font-size: 14px;
+}
+.chip[aria-current="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+section.cat { padding-top: 26px; scroll-margin-top: 64px; }
+section.cat h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.5rem;
+  margin: 0 0 6px;
+}
+.items { list-style: none; margin: 0; padding: 0; }
+.item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  align-items: start;
+}
+.item h3 { margin: 0; font-size: 17px; font-weight: 700; }
+.item p { margin: 2px 0 0; font-size: 14px; color: var(--muted); }
+.price { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.item .ctl { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; padding-top: 6px; }
+.add {
+  min-height: 44px;
+  padding: 0 20px;
+  border: 2px solid var(--chile);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--chile);
+  font-weight: 700;
+}
+.stepper { display: inline-flex; align-items: center; gap: 4px; }
+.stepper button {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--chile);
+  color: var(--chile-ink);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+.stepper output { min-width: 40px; text-align: center; font-weight: 700; font-size: 18px; font-variant-numeric: tabular-nums; }
+.line-total { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.order {
+  margin-top: 34px;
+  padding: 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 14px;
+}
+.order h2 { font-family: var(--font-display); font-weight: 400; font-size: 1.5rem; margin: 0; }
+.order ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.order li { display: flex; justify-content: space-between; gap: 12px; font-size: 15px; }
+.order li span:last-child { font-variant-numeric: tabular-nums; }
+.order .empty { color: var(--muted); font-size: 15px; }
+.field { display: grid; gap: 6px; }
+.field label, .field legend { font-size: 13px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); padding: 0; }
+.field input[type="text"], .field textarea {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+}
+.field textarea { min-height: 72px; resize: vertical; }
+fieldset.field { border: 0; margin: 0; min-width: 0; }
+.seg { display: flex; gap: 8px; flex-wrap: wrap; }
+.seg label {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 15px;
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 6px;
+  font-weight: 600;
+}
+.seg input { accent-color: var(--chile); width: 18px; height: 18px; }
+
+footer.pitch { margin-top: 34px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; display: grid; gap: 4px; }
+footer.pitch strong { color: var(--ink); font-size: 15px; }
+
+.bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  background: var(--ink);
+  color: var(--bg);
+  padding: 12px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+}
+.bar .in { max-width: 640px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.bar .sum { display: grid; min-width: 0; }
+.bar .sum small { font-size: 13px; opacity: 0.8; }
+.bar .sum b { font-size: 22px; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.go {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 20px;
+  border-radius: 6px;
+  background: var(--chile);
+  color: var(--chile-ink);
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
+}
+.go[aria-disabled="true"] { opacity: 0.45; pointer-events: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .chip, .add, .stepper button, .go { transition: background-color 0.15s, color 0.15s, opacity 0.15s; }
+  html { scroll-behavior: smooth; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="ribbon" id="ribbon"></div>
+
+  <header class="hero">
+    <h1 id="biz-name"></h1>
+    <p id="biz-tag"></p>
+    <div class="meta" id="biz-meta"></div>
+    <div class="promo" id="promo">
+      <span class="tag" id="promo-tag"></span>
+      <strong id="promo-title"></strong>
+      <span id="promo-text"></span>
+    </div>
+  </header>
+
+  <nav class="chips" id="chips" aria-label="Categorías del menú"></nav>
+  <main id="menu"></main>
+
+  <section class="order" aria-labelledby="order-title">
+    <h2 id="order-title">Tu pedido</h2>
+    <div id="lines"></div>
+    <div class="field">
+      <label for="name">Tu nombre</label>
+      <input type="text" id="name" autocomplete="given-name" placeholder="Ej. Carlos">
+    </div>
+    <fieldset class="field">
+      <legend>Entrega</legend>
+      <div class="seg">
+        <label><input type="radio" name="mode" value="Recoger en el local" checked> Recoger</label>
+        <label><input type="radio" name="mode" value="A domicilio"> A domicilio</label>
+      </div>
+    </fieldset>
+    <div class="field">
+      <label for="notes">Notas o dirección</label>
+      <textarea id="notes" placeholder="Sin cebolla, salsa aparte, calle y colonia si es a domicilio"></textarea>
+    </div>
+  </section>
+
+  <footer class="pitch" id="pitch"></footer>
+</div>
+
+<div class="bar">
+  <div class="in">
+    <div class="sum"><small id="count">0 productos</small><b id="total">$0</b></div>
+    <a class="go" id="go" href="#" target="_blank" rel="noopener" aria-disabled="true">Pedir por WhatsApp</a>
+  </div>
+</div>
+
+<script>
+(function () {
+  var C = window.CONFIG;
+  var WA = C.whatsapp;
+  var BUSINESS = C.nombre;
+  var ITEMS = C.productos;
+  var CATS = C.categorias;
+  var qty = {};
+  Object.keys(C.carritoInicial || {}).forEach(function (k) { qty[k] = C.carritoInicial[k]; });
+
+  var fmt = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 0 });
+  var byId = {};
+  ITEMS.forEach(function (i) { byId[i.id] = i; });
+  var $ = function (s) { return document.querySelector(s); };
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+  function renderChips() {
+    $("#chips").innerHTML = CATS.map(function (c, i) {
+      return '<button class="chip" type="button" data-cat="' + c + '"' + (i === 0 ? ' aria-current="true"' : "") + ">" + c + "</button>";
+    }).join("");
+  }
+
+  function stepperHTML(id) {
+    var q = qty[id] || 0;
+    if (!q) return '<button class="add" type="button" data-act="inc" data-id="' + id + '">Agregar</button>';
+    return '<div class="stepper"><button type="button" data-act="dec" data-id="' + id + '" aria-label="Quitar uno">−</button>' +
+      "<output>" + q + '</output><button type="button" data-act="inc" data-id="' + id + '" aria-label="Agregar uno">+</button></div>' +
+      '<span class="line-total">' + fmt.format(q * byId[id].price) + "</span>";
+  }
+
+  function renderMenu() {
+    $("#menu").innerHTML = CATS.map(function (c) {
+      var rows = ITEMS.filter(function (i) { return i.cat === c; }).map(function (i) {
+        return '<li class="item" id="row-' + i.id + '"><div><h3>' + esc(i.name) + "</h3>" + (i.desc ? "<p>" + esc(i.desc) + "</p>" : "") +
+          '</div><div class="price">' + fmt.format(i.price) + '</div><div class="ctl" data-ctl="' + i.id + '">' + stepperHTML(i.id) + "</div></li>";
+      }).join("");
+      return '<section class="cat" id="cat-' + c + '"><h2>' + c + '</h2><ul class="items">' + rows + "</ul></section>";
+    }).join("");
+  }
+
+  function totals() {
+    var n = 0, t = 0;
+    Object.keys(qty).forEach(function (id) { if (qty[id] > 0) { n += qty[id]; t += qty[id] * byId[id].price; } });
+    return { n: n, t: t };
+  }
+
+  function message() {
+    var lines = Object.keys(qty).filter(function (id) { return qty[id] > 0; }).map(function (id) {
+      return "- " + qty[id] + " x " + byId[id].name + " (" + fmt.format(qty[id] * byId[id].price) + ")";
+    });
+    var name = $("#name").value.trim();
+    var mode = document.querySelector('input[name="mode"]:checked').value;
+    var notes = $("#notes").value.trim();
+    var m = "Hola, quiero hacer un pedido en " + BUSINESS + ":\n" + lines.join("\n") + "\nTotal: " + fmt.format(totals().t) + "\nEntrega: " + mode;
+    if (name) m += "\nNombre: " + name;
+    if (notes) m += "\nNotas: " + notes;
+    return m;
+  }
+
+  function renderSummary() {
+    var tt = totals();
+    var ids = Object.keys(qty).filter(function (id) { return qty[id] > 0; });
+    $("#lines").innerHTML = ids.length
+      ? "<ul>" + ids.map(function (id) {
+          return "<li><span>" + qty[id] + " × " + esc(byId[id].name) + "</span><span>" + fmt.format(qty[id] * byId[id].price) + "</span></li>";
+        }).join("") + "</ul>"
+      : '<p class="empty">Aún no agregas nada. Elige de arriba y tu pedido aparece aquí.</p>';
+    $("#count").textContent = tt.n + (tt.n === 1 ? " producto" : " productos");
+    $("#total").textContent = fmt.format(tt.t);
+    var go = $("#go");
+    if (tt.n > 0) {
+      go.setAttribute("aria-disabled", "false");
+      go.href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(message());
+    } else {
+      go.setAttribute("aria-disabled", "true");
+      go.href = "#";
+    }
+  }
+
+  function change(id, d) {
+    var next = Math.max(0, (qty[id] || 0) + d);
+    if (next) qty[id] = next; else delete qty[id];
+    var ctl = document.querySelector('[data-ctl="' + id + '"]');
+    ctl.innerHTML = stepperHTML(id);
+    var target = ctl.querySelector(next ? '[data-act="inc"]' : ".add");
+    if (target) target.focus();
+    renderSummary();
+  }
+
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    if (b.dataset.act) { change(b.dataset.id, b.dataset.act === "inc" ? 1 : -1); return; }
+    if (b.dataset.cat) {
+      var sec = document.getElementById("cat-" + b.dataset.cat);
+      if (sec) sec.scrollIntoView({ block: "start" });
+    }
+  });
+  $("#go").addEventListener("click", function (e) { if (this.getAttribute("aria-disabled") === "true") e.preventDefault(); });
+  ["input", "change"].forEach(function (ev) {
+    $("#name").addEventListener(ev, renderSummary);
+    $("#notes").addEventListener(ev, renderSummary);
+    document.querySelectorAll('input[name="mode"]').forEach(function (r) { r.addEventListener(ev, renderSummary); });
+  });
+
+  function markCurrent() {
+    var current = CATS[0];
+    CATS.forEach(function (c) {
+      var el = document.getElementById("cat-" + c);
+      if (el && el.getBoundingClientRect().top <= 120) current = c;
+    });
+    document.querySelectorAll(".chip").forEach(function (ch) {
+      ch.setAttribute("aria-current", ch.dataset.cat === current ? "true" : "false");
+    });
+  }
+  window.addEventListener("scroll", markCurrent, { passive: true });
+
+  document.title = C.nombre;
+  $("#biz-name").textContent = C.nombre;
+  $("#biz-tag").textContent = C.eslogan;
+  $("#biz-meta").innerHTML = (C.datos || []).map(function (t) { return "<span>" + esc(t) + "</span>"; }).join("");
+  var rib = $("#ribbon");
+  if (C.cintillo) { rib.textContent = C.cintillo; } else { rib.hidden = true; }
+  var pr = C.promo;
+  if (pr && pr.activa) {
+    $("#promo-tag").textContent = pr.etiqueta;
+    $("#promo-title").textContent = pr.titulo;
+    $("#promo-text").textContent = pr.texto;
+  } else { $("#promo").hidden = true; }
+  var pf = $("#pitch");
+  if (C.pie && C.pie.length) {
+    pf.innerHTML = C.pie.map(function (t, i) { return i === 0 ? "<strong>" + esc(t) + "</strong>" : "<span>" + esc(t) + "</span>"; }).join("");
+  } else { pf.hidden = true; }
+
+  renderChips();
+  renderMenu();
+  renderSummary();
+})();
+</script>
+</body>
+</html>
